@@ -1,2 +1,2 @@
 # Chords-Gradle-plugin
-Gradle plugin for Spine Chords library
+Gradle plugin for Spine Chords library.
