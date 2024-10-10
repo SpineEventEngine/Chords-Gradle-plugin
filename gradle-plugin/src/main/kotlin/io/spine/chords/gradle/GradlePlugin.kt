@@ -43,17 +43,23 @@ import org.gradle.internal.os.OperatingSystem
  * [codegen/plugins](https://github.com/SpineEventEngine/Chords/tree/master/codegen/plugins)
  * to a module, which requires the code generation for Proto sources.
  *
+ * It is required to configure the artifact of codegen plugins,
+ * which should be used by the plugin for code generation.
+ *
  * Adds a dependency for the `compileKotlin` task if it is present in the project.
  * Otherwise, it should be configured manually in the project build script.
- * The task `generateKotlinExtensions` should be configured to execute in this case.
+ * The task `applyCodegenPlugins` should be configured to execute in this case.
  *
  * The dependencies on Proto sources that are required for code generation
- * can be configured in the following way:
+ * can be configured in the build script.
+ *
+ * Below is an example configuration of the plugin:
  * ```
  * chordsGradlePlugin {
- *     protoDependencies("io.spine:spine-money:1.5.0")
  *     codegenPluginsArtifact =
  *         "io.spine.chords:spine-chords-codegen-plugins:2.0.0-SNAPSHOT.27"
+ *
+ *     protoDependencies("io.spine:spine-money:1.5.0")
  * }
  * ```
  */
@@ -149,7 +155,6 @@ public class GradlePlugin : Plugin<Project> {
         val gradleWrapperJar = File(workspaceDir, gradleWrapperJar)
         if (!gradleWrapperJar.exists()) {
             gradleWrapperJar.parentFile.mkdirs()
-            //System.err.println("Copy file:" + gradleWrapperJar.path)
             loadResourceAsStream("/gradle-wrapper.zip")
                 .copyTo(gradleWrapperJar.outputStream())
         }
@@ -178,6 +183,7 @@ public class GradlePlugin : Plugin<Project> {
     /**
      * Returns the list of resources in the classpath by the [path] specified.
      */
+    @Suppress("SameParameterValue")
     private fun listResources(path: String): Set<String> {
         val resourceUrl = loadResource(path)
         check(resourceUrl.protocol == "jar") {
