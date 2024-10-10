@@ -38,8 +38,6 @@ plugins {
 
     // https://github.com/jk1/Gradle-License-Report/releases
     id("com.github.jk1.dependency-license-report").version("1.16")
-    // https://github.com/johnrengelman/shadow/releases
-    id("com.github.johnrengelman.shadow").version("6.1.0")
 }
 
 repositories {
@@ -145,6 +143,15 @@ val kotestJvmPluginVersion = "0.3.8"
  */
 val koverVersion = "0.6.1"
 
+/**
+ * The version of the Shadow Plugin.
+ *
+ * `6.1.0` is the last version compatible with Gradle 6.9.x.
+ *
+ * @see <a href="https://github.com/johnrengelman/shadow/releases">Shadow Plugin releases</a>
+ */
+val shadowVersion = "6.1.0"
+
 configurations.all {
     resolutionStrategy {
         force(
@@ -158,9 +165,11 @@ configurations.all {
     }
 }
 
+@Suppress("UnstableApiUsage")
 val jvmVersion = JavaLanguageVersion.of(11)
 
 java {
+    @Suppress("UnstableApiUsage")
     toolchain.languageVersion.set(jvmVersion)
 }
 
@@ -192,7 +201,8 @@ dependencies {
         "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion",
         "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
         "org.jetbrains.kotlinx.kover:org.jetbrains.kotlinx.kover.gradle.plugin:$koverVersion",
-        "org.jetbrains.kotlin.jvm:org.jetbrains.kotlin.jvm.gradle.plugin:$kotlinVersion"
+        "org.jetbrains.kotlin.jvm:org.jetbrains.kotlin.jvm.gradle.plugin:$kotlinVersion",
+        "com.github.jengelman.gradle.plugins:shadow:${shadowVersion}"
     ).forEach {
         implementation(it)
     }
@@ -205,26 +215,14 @@ buildscript {
     }
 
     /**
-     * The version of the Shadow Plugin.
-     *
-     * `6.1.0` is the last version compatible with Gradle 6.9. Newer versions require Gradle v7+.
-     *
-     * @see <a href="https://github.com/johnrengelman/shadow/releases">Shadow Plugin releases</a>
-     */
-    val shadowVersion = "6.1.0"
-
-    /**
      * @see [io.spine.internal.dependency.Kover]
      */
     val koverVersion = "0.6.1"
 
     dependencies {
-        classpath("com.github.jengelman.gradle.plugins:shadow:$shadowVersion")
         classpath("org.jetbrains.kotlinx.kover:org.jetbrains.kotlinx.kover.gradle.plugin:$koverVersion")
     }
 }
-
-apply(plugin = "com.github.johnrengelman.shadow")
 
 dependOnBuildSrcJar()
 

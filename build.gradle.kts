@@ -94,7 +94,7 @@ spinePublishing {
     modulesWithCustomPublishing = setOf(gradlePluginModuleName)
 
     destinations = setOf(
-        PublishingRepos.gitHub("Chords"),
+        PublishingRepos.gitHub("Chords-Gradle-plugin"),
         PublishingRepos.cloudArtifactRegistry
     )
     artifactPrefix = ChordsPublishing.artifactPrefix
