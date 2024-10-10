@@ -53,7 +53,7 @@ public class ParametersExtension {
 
     /**
      * Allows to specify dependencies on Proto sources that are required
-     * to generate the code.
+     * to generate the code for Proto messages.
      */
     public fun protoDependencies(vararg protoDependencies: String) {
         dependencies.clear()

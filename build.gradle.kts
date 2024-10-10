@@ -27,7 +27,6 @@
 import io.spine.internal.dependency.Dokka
 import io.spine.internal.dependency.Guava
 import io.spine.internal.dependency.KotlinX
-import io.spine.internal.gradle.BuildCodegenPlugins
 import io.spine.internal.gradle.publish.ChordsPublishing
 import io.spine.internal.gradle.publish.PublishingRepos
 import io.spine.internal.gradle.publish.spinePublishing

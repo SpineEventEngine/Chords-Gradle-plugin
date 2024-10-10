@@ -113,7 +113,6 @@ gradlePlugin {
     }
 }
 
-
 // Path to the directory that contains `gradle-wrapper.jar`.
 //
 // It is needed to add this jar as a resource because `ShadowJar`

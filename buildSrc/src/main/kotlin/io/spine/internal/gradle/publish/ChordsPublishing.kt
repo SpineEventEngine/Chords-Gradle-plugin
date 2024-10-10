@@ -43,7 +43,7 @@ object ChordsPublishing {
      * See `codegen/gradle-plugin` for detail.
      */
     object GradlePlugin {
-        const val id = "io.spine.chords.gradle"
+        const val id = "io.spine.chords"
 
         val metadataUrl = URL(
             "https://plugins.gradle.org/m2/$id/$id.gradle.plugin/$FILE_NAME"

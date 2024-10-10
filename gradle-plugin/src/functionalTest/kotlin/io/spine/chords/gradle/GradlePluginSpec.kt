@@ -45,7 +45,7 @@ class GradlePluginSpec {
         /**
          * The `id` of the plugin to apply.
          */
-        private const val pluginId = "io.spine.chords.gradle"
+        private const val pluginId = "io.spine.chords"
 
         /**
          * Source Proto file to generate the code for.
@@ -81,14 +81,14 @@ class GradlePluginSpec {
         val result = GradleRunner.create()
             .forwardOutput()
             .withPluginClasspath()
-            .withArguments("generateKotlinExtensions")
+            .withArguments("applyCodegenPlugins")
             .withProjectDir(projectDir)
             .build()
 
         listOf(
             "> Task :createCodegenWorkspace",
             "> Task :addGradleWrapperRunPermission",
-            "> Task :generateKotlinExtensions",
+            "> Task :applyCodegenPlugins",
             "BUILD SUCCESSFUL"
         ).forEach { message ->
             result.output.contains(message) shouldBe true

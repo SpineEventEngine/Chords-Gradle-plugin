@@ -90,8 +90,8 @@ public class GradlePlugin : Plugin<Project> {
                 }
             }
 
-        val generateKotlinExtensions = project.tasks
-            .register("generateKotlinExtensions", GenerateCode::class.java) { task ->
+        val applyCodegenPlugins = project.tasks
+            .register("applyCodegenPlugins", ApplyCodegenPlugins::class.java) { task ->
                 task.dependsOn(addGradleWrapperRunPermission)
                 task.workspaceDir = workspaceDir.path
                 task.dependencies(project.extension.dependencies)
@@ -100,13 +100,13 @@ public class GradlePlugin : Plugin<Project> {
 
         val compileKotlin = project.tasks.findByName("compileKotlin")
         if (compileKotlin != null) {
-            compileKotlin.dependsOn(generateKotlinExtensions)
+            compileKotlin.dependsOn(applyCodegenPlugins)
         } else {
             project.logger.warn(
                 """
-                Warning! `Chords-Gradle-plugin` is not configured properly.
+                Warning! `Chords-Gradle-plugin` will not be applied to module `${project.name}`.
                 Task `compileKotlin` not found, so required dependency was not added.
-                To generate Kotlin extensions, execute the `generateKotlinExtensions` task.
+                To generate code, execute the `applyCodegenPlugins` task before `compileKotlin`.
                 """.trimIndent()
             )
         }
