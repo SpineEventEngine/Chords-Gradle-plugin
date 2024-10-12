@@ -1,0 +1,27 @@
+name: Build under Ubuntu
+
+on: push
+
+jobs:
+  build:
+    name: Build under Ubuntu
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: 11
+          distribution: zulu
+          cache: gradle
+
+      - name: Build all libraries
+        shell: bash
+        run: ./gradlew build --stacktrace
