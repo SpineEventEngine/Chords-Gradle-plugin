@@ -114,7 +114,7 @@ gradlePlugin {
 
 publishing.publications.withType<MavenPublication>().all {
     groupId = "io.spine.chords"
-    artifactId = "gradle-plugin"
+    artifactId = "spine-chords-gradle-plugin"
 }
 
 // Path to the directory that contains `gradle-wrapper.jar`.
