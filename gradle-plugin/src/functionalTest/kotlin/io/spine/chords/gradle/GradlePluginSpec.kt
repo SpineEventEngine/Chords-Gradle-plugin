@@ -47,6 +47,9 @@ class GradlePluginSpec {
          */
         private const val pluginId = "io.spine.chords"
 
+        /**
+         * The Spine cloud artifacts repo to load the `codegen-plugins` from.
+         */
         private const val spineArtifactsRepo =
             "https://europe-maven.pkg.dev/spine-event-engine"
 

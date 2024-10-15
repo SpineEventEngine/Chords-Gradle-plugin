@@ -26,16 +26,11 @@
 
 package io.spine.chords.gradle
 
-import com.google.common.io.Files
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.internal.os.OperatingSystem
-import java.io.BufferedInputStream
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.util.zip.ZipEntry
-import java.util.zip.ZipInputStream
+import java.util.zip.ZipFile
 
 /**
  * A Gradle [Plugin] that generates Kotlin extensions for Proto messages.
@@ -129,7 +124,6 @@ public class GradlePlugin : Plugin<Project> {
         if (OperatingSystem.current().isWindows) {
             return
         }
-
         ProcessBuilder()
             .command("chmod", "+x", "./gradlew")
             .directory(workspaceDir)
@@ -137,13 +131,12 @@ public class GradlePlugin : Plugin<Project> {
     }
 
     /**
-     * Copies the necessary resources from classpath.
+     * Copies the necessary resources from the `codegen-plugins` artifact.
      *
      * Actually, it creates a `workspace` module, in which the code generation
      * is to be performed.
      */
     private fun createCodegenWorkspace(project: Project, workspaceDir: File) {
-
         val configurationName = "workspace"
         val workspace = project.configurations.create(configurationName) {
             it.isTransitive = false
@@ -152,25 +145,32 @@ public class GradlePlugin : Plugin<Project> {
             configurationName,
             project.extension.codegenPluginsArtifact
         )
-
         File(workspace.asPath).unzipTo(workspaceDir.parentFile) {
             it.contains(workspaceModuleName)
         }
     }
 }
 
-public fun File.unzipTo(unzipDir: File, entryFilter: (entryName: String) -> Boolean) {
-    ZipInputStream(BufferedInputStream(FileInputStream(this))).use { inputStream ->
-        var entry: ZipEntry?
-        while (inputStream.nextEntry.also { entry = it } != null) {
-            val entryName = entry!!.name
-            if (entry!!.isDirectory || !entryFilter(entryName)) {
-                continue
+/**
+ * Unpacks zip file to [destinationDir], applying the given [entryFilter] to the entries.
+ */
+public fun File.unzipTo(
+    destinationDir: File,
+    entryFilter: (entryName: String) -> Boolean
+) {
+    ZipFile(this).use { zipFile ->
+        zipFile.entries().asSequence()
+            .filter { entry ->
+                !entry.isDirectory && entryFilter(entry.name)
             }
-            val destinationFile = File(unzipDir, entryName)
-            Files.createParentDirs(destinationFile)
-            inputStream.copyTo(FileOutputStream(destinationFile))
-        }
+            .forEach { entry ->
+                File(destinationDir, entry.name).also { destinationFile ->
+                    destinationFile.parentFile.mkdirs()
+                    zipFile.getInputStream(entry).copyTo(
+                        destinationFile.outputStream()
+                    )
+                }
+            }
     }
 }
 
