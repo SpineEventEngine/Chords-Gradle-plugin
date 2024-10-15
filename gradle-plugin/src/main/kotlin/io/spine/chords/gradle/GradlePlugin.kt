@@ -26,15 +26,16 @@
 
 package io.spine.chords.gradle
 
-import java.io.File
-import java.io.InputStream
-import java.net.URL
-import java.net.URLDecoder
-import java.util.jar.JarFile
+import com.google.common.io.Files
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.internal.os.OperatingSystem
-
+import java.io.BufferedInputStream
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
 
 /**
  * A Gradle [Plugin] that generates Kotlin extensions for Proto messages.
@@ -68,7 +69,6 @@ public class GradlePlugin : Plugin<Project> {
     @Suppress("ConstPropertyName")
     private companion object {
         private const val workspaceModuleName = "codegen-workspace"
-        private const val gradleWrapperJar = "gradle/wrapper/gradle-wrapper.jar"
     }
 
     /**
@@ -78,13 +78,14 @@ public class GradlePlugin : Plugin<Project> {
     override fun apply(project: Project) {
 
         val workspaceDir = File(project.buildDir, workspaceModuleName)
+        workspaceDir.mkdirs()
 
         project.createExtension()
 
         val createCodegenWorkspace = project.tasks
             .register("createCodegenWorkspace") { task ->
                 task.doLast {
-                    createCodegenWorkspace(workspaceDir)
+                    createCodegenWorkspace(project, workspaceDir)
                 }
             }
 
@@ -141,70 +142,35 @@ public class GradlePlugin : Plugin<Project> {
      * Actually, it creates a `workspace` module, in which the code generation
      * is to be performed.
      */
-    private fun createCodegenWorkspace(workspaceDir: File) {
-        val resourcesRoot = "/$workspaceModuleName"
-        listResources(resourcesRoot).forEach { resource ->
-            val outputFile = File(workspaceDir, resource)
-            val inputStream = loadResourceAsStream(
-                resourcesRoot + resource
-            )
-            outputFile.parentFile.mkdirs()
-            outputFile.writeBytes(inputStream.readBytes())
-        }
+    private fun createCodegenWorkspace(project: Project, workspaceDir: File) {
 
-        val gradleWrapperJar = File(workspaceDir, gradleWrapperJar)
-        if (!gradleWrapperJar.exists()) {
-            gradleWrapperJar.parentFile.mkdirs()
-            loadResourceAsStream("/gradle-wrapper.zip")
-                .copyTo(gradleWrapperJar.outputStream())
+        val configurationName = "workspace"
+        val workspace = project.configurations.create(configurationName) {
+            it.isTransitive = false
+        }
+        project.dependencies.add(
+            configurationName,
+            project.extension.codegenPluginsArtifact
+        )
+
+        File(workspace.asPath).unzipTo(workspaceDir.parentFile) {
+            it.contains(workspaceModuleName)
         }
     }
+}
 
-    /**
-     * Loads the specified resource from classpath.
-     *
-     * @throws IllegalStateException If the requested resource is not available.
-     */
-    private fun loadResource(path: String): URL {
-        val resourceUrl = this::class.java.getResource(path)
-        checkNotNull(resourceUrl) {
-            "Resource not found in classpath: `$path`."
-        }
-        return resourceUrl
-    }
-
-    /**
-     * Opens [InputStream] on the specified resource in the classpath.
-     */
-    private fun loadResourceAsStream(path: String): InputStream {
-        return loadResource(path).openStream()
-    }
-
-    /**
-     * Returns the list of resources in the classpath by the [path] specified.
-     */
-    @Suppress("SameParameterValue")
-    private fun listResources(path: String): Set<String> {
-        val resourceUrl = loadResource(path)
-        check(resourceUrl.protocol == "jar") {
-            "Protocol is not supported yet: `${resourceUrl.protocol}`."
-        }
-        val result: MutableSet<String> = mutableSetOf()
-        val resourcePath = resourceUrl.path
-        val afterProtocol = "file:".length
-        val beforeJarEntry = resourcePath.indexOf("!")
-        val jarPath = resourcePath.substring(afterProtocol, beforeJarEntry)
-        val jarFile = JarFile(URLDecoder.decode(jarPath, "UTF-8"))
-        val jarEntries = jarFile.entries()
-        while (jarEntries.hasMoreElements()) {
-            val entryName = jarEntries.nextElement().name
-            if (entryName.startsWith(path.substring(1))
-                && !entryName.endsWith("/")
-            ) {
-                result.add(entryName.substring(path.length - 1))
+public fun File.unzipTo(unzipDir: File, entryFilter: (entryName: String) -> Boolean) {
+    ZipInputStream(BufferedInputStream(FileInputStream(this))).use { inputStream ->
+        var entry: ZipEntry?
+        while (inputStream.nextEntry.also { entry = it } != null) {
+            val entryName = entry!!.name
+            if (entry!!.isDirectory || !entryFilter(entryName)) {
+                continue
             }
+            val destinationFile = File(unzipDir, entryName)
+            Files.createParentDirs(destinationFile)
+            inputStream.copyTo(FileOutputStream(destinationFile))
         }
-        return result
     }
 }
 
