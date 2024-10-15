@@ -751,4 +751,4 @@
 
 The dependencies distributed under several licenses, are used according their commercial-use-friendly license.
 
-This report was generated on **Tue Oct 15 23:08:57 EEST 2024** using [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by Evgeny Naumenko, licensed under [Apache 2.0 License](https://github.com/jk1/Gradle-License-Report/blob/master/LICENSE).
+This report was generated on **Tue Oct 15 23:56:00 EEST 2024** using [Gradle-License-Report plugin](https://github.com/jk1/Gradle-License-Report) by Evgeny Naumenko, licensed under [Apache 2.0 License](https://github.com/jk1/Gradle-License-Report/blob/master/LICENSE).

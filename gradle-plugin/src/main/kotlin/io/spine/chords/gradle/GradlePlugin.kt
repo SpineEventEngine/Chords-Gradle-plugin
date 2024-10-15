@@ -73,7 +73,6 @@ public class GradlePlugin : Plugin<Project> {
     override fun apply(project: Project) {
 
         val workspaceDir = File(project.buildDir, workspaceModuleName)
-        workspaceDir.mkdirs()
 
         project.createExtension()
 
@@ -137,6 +136,7 @@ public class GradlePlugin : Plugin<Project> {
      * is to be performed.
      */
     private fun createCodegenWorkspace(project: Project, workspaceDir: File) {
+        workspaceDir.mkdirs()
         val configurationName = "workspace"
         val workspace = project.configurations.create(configurationName) {
             it.isTransitive = false
