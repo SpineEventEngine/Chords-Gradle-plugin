@@ -32,7 +32,6 @@ plugins {
     `java-gradle-plugin`
     `maven-publish`
 //    id("com.gradle.plugin-publish") version "0.12.0"
-    id("com.github.johnrengelman.shadow")
 }
 
 repositories {
@@ -59,9 +58,7 @@ val functionalTestTask = tasks.register<Test>("functionalTest") {
 }
 
 tasks.withType(Test::class) {
-    useJUnitPlatform {
-        includeEngines("junit-jupiter")
-    }
+    useJUnitPlatform {}
 }
 
 tasks.named("test") {
@@ -106,7 +103,7 @@ gradlePlugin {
             displayName = "Chords Codegen Gradle Plugin"
             description = "A plugin that generates Kotlin extensions for Proto messages."
             implementationClass = "io.spine.chords.gradle.GradlePlugin"
-           //tags.set(listOf("spine", "chords", "gradle", "plugin", "codegen"))
+            //tags.set(listOf("spine", "chords", "gradle", "plugin", "codegen"))
         }
     }
 }

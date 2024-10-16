@@ -24,4 +24,4 @@ jobs:
 
       - name: Build all libraries
         shell: bash
-        run: ./gradlew build --stacktrace
+        run: ./gradlew build --stacktrace -i

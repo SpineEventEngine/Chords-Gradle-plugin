@@ -91,27 +91,26 @@ public class GradlePlugin : Plugin<Project> {
                 }
             }
 
-        //val applyCodegenPlugins =
-        project.tasks
+        val applyCodegenPlugins = project.tasks
             .register("applyCodegenPlugins", ApplyCodegenPlugins::class.java) { task ->
                 task.dependsOn(addGradleWrapperRunPermission)
                 task.workspaceDir = workspaceDir.path
-                task.dependencies(project.extension.dependencies)
                 task.codegenPluginsArtifact = project.extension.codegenPluginsArtifact
+                task.dependencies(project.extension.dependencies)
             }
 
-//        val compileKotlin = project.tasks.findByName("compileKotlin")
-//        if (compileKotlin != null) {
-//            compileKotlin.dependsOn(applyCodegenPlugins)
-//        } else {
-//            project.logger.warn(
-//                """
-//                Warning! `Chords-Gradle-plugin` will not be applied to module `${project.name}`.
-//                Task `compileKotlin` not found, so required dependency was not added.
-//                To generate code, execute the `applyCodegenPlugins` task before `compileKotlin`.
-//                """.trimIndent()
-//            )
-//        }
+        val compileKotlin = project.tasks.findByName("compileKotlin")
+        if (compileKotlin != null) {
+            compileKotlin.dependsOn(applyCodegenPlugins)
+        } else {
+            project.logger.warn(
+                """
+                Warning! `Chords-Gradle-plugin` will not be applied to module `${project.name}`.
+                Task `compileKotlin` not found, so required dependency was not added.
+                To generate code, execute `applyCodegenPlugins` task before `compileKotlin`.
+                """
+            )
+        }
     }
 
     /**
@@ -174,9 +173,3 @@ public fun File.unzipTo(
             }
     }
 }
-
-/**
- * Obtains the extension the plugin added to this Gradle project.
- */
-private val Project.extension: ParametersExtension
-    get() = extensions.getByType(ParametersExtension::class.java)
