@@ -63,7 +63,15 @@ public class GradlePlugin : Plugin<Project> {
 
     @Suppress("ConstPropertyName")
     private companion object {
+        /**
+         * A placeholder for code generation module name.
+         */
         private const val workspaceModuleName = "codegen-workspace"
+
+        /**
+         * The millis to delay after run permission is set to Gradle wrapper.
+         */
+        private const val delayAfterPermissionSet = 2000L
     }
 
     /**
@@ -127,6 +135,7 @@ public class GradlePlugin : Plugin<Project> {
             .command("chmod", "+x", "./gradlew")
             .directory(workspaceDir)
             .start()
+        Thread.sleep(delayAfterPermissionSet)
     }
 
     /**
@@ -166,9 +175,9 @@ public fun File.unzipTo(
             .forEach { entry ->
                 File(destinationDir, entry.name).also { destinationFile ->
                     destinationFile.parentFile.mkdirs()
-                    zipFile.getInputStream(entry).copyTo(
-                        destinationFile.outputStream()
-                    )
+                    val outputStream = destinationFile.outputStream()
+                    zipFile.getInputStream(entry).copyTo(outputStream)
+                    outputStream.close()
                 }
             }
     }
