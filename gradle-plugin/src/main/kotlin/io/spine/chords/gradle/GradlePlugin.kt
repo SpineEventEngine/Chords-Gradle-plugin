@@ -30,6 +30,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.internal.os.OperatingSystem
 import java.io.File
+import java.lang.Thread.sleep
 import java.util.zip.ZipFile
 
 /**
@@ -71,7 +72,7 @@ public class GradlePlugin : Plugin<Project> {
         /**
          * The millis to delay after run permission is set to Gradle wrapper.
          */
-        private const val delayAfterPermissionSet = 2000L
+        private const val delayAfterRunPermissionSet = 2000L
     }
 
     /**
@@ -135,7 +136,7 @@ public class GradlePlugin : Plugin<Project> {
             .command("chmod", "+x", "./gradlew")
             .directory(workspaceDir)
             .start()
-        Thread.sleep(delayAfterPermissionSet)
+        sleep(delayAfterRunPermissionSet)
     }
 
     /**
@@ -175,8 +176,13 @@ public fun File.unzipTo(
             .forEach { entry ->
                 File(destinationDir, entry.name).also { destinationFile ->
                     destinationFile.parentFile.mkdirs()
+                    val inputStream = zipFile.getInputStream(entry)
                     val outputStream = destinationFile.outputStream()
-                    zipFile.getInputStream(entry).copyTo(outputStream)
+                    inputStream.copyTo(outputStream)
+                    // The streams are closed directly because sometimes
+                    // the test can fail due to the Gradle wrapper executable
+                    // being locked by another process.
+                    inputStream.close()
                     outputStream.close()
                 }
             }
