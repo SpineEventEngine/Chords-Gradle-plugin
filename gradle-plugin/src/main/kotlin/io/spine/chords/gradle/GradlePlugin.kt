@@ -30,7 +30,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.internal.os.OperatingSystem
 import java.io.File
-import java.lang.Thread.sleep
 import java.util.zip.ZipFile
 
 /**
@@ -64,15 +63,7 @@ public class GradlePlugin : Plugin<Project> {
 
     @Suppress("ConstPropertyName")
     private companion object {
-        /**
-         * A placeholder for code generation module name.
-         */
         private const val workspaceModuleName = "codegen-workspace"
-
-        /**
-         * The millis to delay after run permission is set to Gradle wrapper.
-         */
-        private const val delayAfterRunPermissionSet = 2000L
     }
 
     /**
@@ -136,7 +127,6 @@ public class GradlePlugin : Plugin<Project> {
             .command("chmod", "+x", "./gradlew")
             .directory(workspaceDir)
             .start()
-        sleep(delayAfterRunPermissionSet)
     }
 
     /**
