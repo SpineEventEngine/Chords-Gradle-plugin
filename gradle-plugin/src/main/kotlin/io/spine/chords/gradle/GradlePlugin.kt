@@ -91,7 +91,8 @@ public class GradlePlugin : Plugin<Project> {
                 }
             }
 
-        val applyCodegenPlugins = project.tasks
+        //val applyCodegenPlugins =
+        project.tasks
             .register("applyCodegenPlugins", ApplyCodegenPlugins::class.java) { task ->
                 task.dependsOn(addGradleWrapperRunPermission)
                 task.workspaceDir = workspaceDir.path
@@ -99,18 +100,18 @@ public class GradlePlugin : Plugin<Project> {
                 task.codegenPluginsArtifact = project.extension.codegenPluginsArtifact
             }
 
-        val compileKotlin = project.tasks.findByName("compileKotlin")
-        if (compileKotlin != null) {
-            compileKotlin.dependsOn(applyCodegenPlugins)
-        } else {
-            project.logger.warn(
-                """
-                Warning! `Chords-Gradle-plugin` will not be applied to module `${project.name}`.
-                Task `compileKotlin` not found, so required dependency was not added.
-                To generate code, execute the `applyCodegenPlugins` task before `compileKotlin`.
-                """.trimIndent()
-            )
-        }
+//        val compileKotlin = project.tasks.findByName("compileKotlin")
+//        if (compileKotlin != null) {
+//            compileKotlin.dependsOn(applyCodegenPlugins)
+//        } else {
+//            project.logger.warn(
+//                """
+//                Warning! `Chords-Gradle-plugin` will not be applied to module `${project.name}`.
+//                Task `compileKotlin` not found, so required dependency was not added.
+//                To generate code, execute the `applyCodegenPlugins` task before `compileKotlin`.
+//                """.trimIndent()
+//            )
+//        }
     }
 
     /**
