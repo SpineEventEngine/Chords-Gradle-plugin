@@ -58,7 +58,9 @@ val functionalTestTask = tasks.register<Test>("functionalTest") {
 }
 
 tasks.withType(Test::class) {
-    useJUnitPlatform {}
+    useJUnitPlatform {
+        includeEngines("junit-jupiter")
+    }
 }
 
 tasks.named("test") {
