@@ -130,10 +130,8 @@ public class GradlePlugin : Plugin<Project> {
     }
 
     /**
-     * Copies the necessary resources from the `codegen-plugins` artifact.
-     *
-     * Actually, it creates a `workspace` module, in which the code generation
-     * is to be performed.
+     * Creates the `workspace` module in which the code generation will be performed,
+     * by fetching the required resource files from the `codegen-plugins` artifact.
      */
     private fun createCodegenWorkspace(project: Project, workspaceDir: File) {
         workspaceDir.mkdirs()
