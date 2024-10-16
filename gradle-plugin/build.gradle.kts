@@ -24,7 +24,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.spine.internal.dependency.JUnit
 import io.spine.internal.gradle.publish.ChordsPublishing
 import io.spine.internal.gradle.publish.SpinePublishing
@@ -33,7 +32,6 @@ plugins {
     `java-gradle-plugin`
     `maven-publish`
 //    id("com.gradle.plugin-publish") version "0.12.0"
-    id("com.github.johnrengelman.shadow")
 }
 
 repositories {
@@ -107,7 +105,7 @@ gradlePlugin {
             displayName = "Chords Codegen Gradle Plugin"
             description = "A plugin that generates Kotlin extensions for Proto messages."
             implementationClass = "io.spine.chords.gradle.GradlePlugin"
-           //tags.set(listOf("spine", "chords", "gradle", "plugin", "codegen"))
+            //tags.set(listOf("spine", "chords", "gradle", "plugin", "codegen"))
         }
     }
 }
@@ -115,77 +113,6 @@ gradlePlugin {
 publishing.publications.withType<MavenPublication>().all {
     groupId = "io.spine.chords"
     artifactId = "spine-chords-gradle-plugin"
-}
-
-// Path to the directory that contains `gradle-wrapper.jar`.
-//
-// It is needed to add this jar as a resource because `ShadowJar`
-// merges the content of the jars instead of copying.
-//
-val gradleWrapperDir = project.projectDir
-    .resolve("src")
-    .resolve("main")
-    .resolve("resources")
-    .resolve("codegen-workspace")
-    .resolve("gradle")
-    .resolve("wrapper")
-    .path
-
-val shadowJar by tasks.getting(ShadowJar::class) {
-    archiveClassifier.set("")
-    exclude(
-        "org/checkerframework/**",
-        "org/jboss/**",
-
-        // Exclude license files that cause or may cause issues with LicenseReport.
-        // We analyze these files when building artifacts we depend on.
-        "about_files/**",
-
-        "ant_tasks/**", // `resource-ant.jar` is of no use here.
-
-        // Protobuf files.
-        "google/**",
-        "spine/**",
-        "src/**",
-
-        // Java source code files of the package `org.osgi`.
-        "OSGI-OPT/**",
-
-        // Unnecessary settings from the Eclipse Platform.
-        "OSGI-INF/**",
-
-        "META-INF/com.android.tools/**",
-        "META-INF/maven/**",
-        "META-INF/native-image/**",
-        "META-INF/proguard/**",
-        "META-INF/services/org.jboss.forge.roaster.*.*",
-        "META-INF/eclipse.inf",
-
-        // Checker Framework license.
-        "META-INF/LICENSE.txt",
-
-        // OSGi notices
-        "META-INF/NOTICE",
-
-        // Unnecessary stuff from the Eclipse Platform and other dependencies.
-        ".api_description",
-        ".options",
-        "_base_main_unspecified.desc",
-        "_base_main_unspecified.desc",
-        "about.html",
-        "profile.plist",
-        "*.profile",
-        "jdtCompilerAdapter.jar",
-        "plugin.properties",
-        "plugin.xml",
-        "systembundle.properties"
-    )
-
-    // Copies `gradle-wrapper.jar` as a `zip` file.
-    from(gradleWrapperDir) {
-        include("*.jar")
-        rename("(.+).jar", "$1.zip")
-    }
 }
 
 // Add the common prefix to the `pluginMaven` publication.

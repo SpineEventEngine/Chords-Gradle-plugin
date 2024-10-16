@@ -48,6 +48,12 @@ class GradlePluginSpec {
         private const val pluginId = "io.spine.chords"
 
         /**
+         * The Spine cloud artifacts repo to load the `codegen-plugins` from.
+         */
+        private const val spineArtifactsRepo =
+            "https://europe-maven.pkg.dev/spine-event-engine"
+
+        /**
          * Source Proto file to generate the code for.
          */
         private const val sourceProtoFile =
@@ -72,7 +78,7 @@ class GradlePluginSpec {
 
         File(projectDir, "settings.gradle.kts").writeText("")
         File(projectDir, "build.gradle.kts").writeText(
-            generateGradleBuildFile(pluginId)
+            generateGradleBuildFile(pluginId, spineArtifactsRepo)
         )
         File(projectDir, sourceProtoFile).writeText(
             protoFileContent

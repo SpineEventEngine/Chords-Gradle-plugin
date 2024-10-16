@@ -75,3 +75,9 @@ internal fun Project.createExtension(): ParametersExtension {
     extensions.add(ParametersExtension::class.java, extensionName, extension)
     return extension
 }
+
+/**
+ * Obtains the extension the plugin added to this Gradle project.
+ */
+internal val Project.extension: ParametersExtension
+    get() = extensions.getByType(ParametersExtension::class.java)

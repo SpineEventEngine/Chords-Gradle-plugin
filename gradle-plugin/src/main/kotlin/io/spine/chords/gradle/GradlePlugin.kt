@@ -26,15 +26,11 @@
 
 package io.spine.chords.gradle
 
-import java.io.File
-import java.io.InputStream
-import java.net.URL
-import java.net.URLDecoder
-import java.util.jar.JarFile
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.internal.os.OperatingSystem
-
+import java.io.File
+import java.util.zip.ZipFile
 
 /**
  * A Gradle [Plugin] that generates Kotlin extensions for Proto messages.
@@ -68,7 +64,6 @@ public class GradlePlugin : Plugin<Project> {
     @Suppress("ConstPropertyName")
     private companion object {
         private const val workspaceModuleName = "codegen-workspace"
-        private const val gradleWrapperJar = "gradle/wrapper/gradle-wrapper.jar"
     }
 
     /**
@@ -84,7 +79,7 @@ public class GradlePlugin : Plugin<Project> {
         val createCodegenWorkspace = project.tasks
             .register("createCodegenWorkspace") { task ->
                 task.doLast {
-                    createCodegenWorkspace(workspaceDir)
+                    createCodegenWorkspace(project, workspaceDir)
                 }
             }
 
@@ -100,8 +95,8 @@ public class GradlePlugin : Plugin<Project> {
             .register("applyCodegenPlugins", ApplyCodegenPlugins::class.java) { task ->
                 task.dependsOn(addGradleWrapperRunPermission)
                 task.workspaceDir = workspaceDir.path
-                task.dependencies(project.extension.dependencies)
                 task.codegenPluginsArtifact = project.extension.codegenPluginsArtifact
+                task.dependencies(project.extension.dependencies)
             }
 
         val compileKotlin = project.tasks.findByName("compileKotlin")
@@ -112,8 +107,8 @@ public class GradlePlugin : Plugin<Project> {
                 """
                 Warning! `Chords-Gradle-plugin` will not be applied to module `${project.name}`.
                 Task `compileKotlin` not found, so required dependency was not added.
-                To generate code, execute the `applyCodegenPlugins` task before `compileKotlin`.
-                """.trimIndent()
+                To generate code, execute `applyCodegenPlugins` task before `compileKotlin`.
+                """
             )
         }
     }
@@ -128,7 +123,6 @@ public class GradlePlugin : Plugin<Project> {
         if (OperatingSystem.current().isWindows) {
             return
         }
-
         ProcessBuilder()
             .command("chmod", "+x", "./gradlew")
             .directory(workspaceDir)
@@ -136,80 +130,49 @@ public class GradlePlugin : Plugin<Project> {
     }
 
     /**
-     * Copies the necessary resources from classpath.
-     *
-     * Actually, it creates a `workspace` module, in which the code generation
-     * is to be performed.
+     * Creates the `workspace` module in which the code generation will be performed,
+     * by fetching the required resource files from the `codegen-plugins` artifact.
      */
-    private fun createCodegenWorkspace(workspaceDir: File) {
-        val resourcesRoot = "/$workspaceModuleName"
-        listResources(resourcesRoot).forEach { resource ->
-            val outputFile = File(workspaceDir, resource)
-            val inputStream = loadResourceAsStream(
-                resourcesRoot + resource
-            )
-            outputFile.parentFile.mkdirs()
-            outputFile.writeBytes(inputStream.readBytes())
+    private fun createCodegenWorkspace(project: Project, workspaceDir: File) {
+        workspaceDir.mkdirs()
+        val configurationName = "workspace"
+        val workspace = project.configurations.create(configurationName) {
+            it.isTransitive = false
         }
-
-        val gradleWrapperJar = File(workspaceDir, gradleWrapperJar)
-        if (!gradleWrapperJar.exists()) {
-            gradleWrapperJar.parentFile.mkdirs()
-            loadResourceAsStream("/gradle-wrapper.zip")
-                .copyTo(gradleWrapperJar.outputStream())
+        project.dependencies.add(
+            configurationName,
+            project.extension.codegenPluginsArtifact
+        )
+        File(workspace.asPath).unzipTo(workspaceDir.parentFile) {
+            it.contains(workspaceModuleName)
         }
-    }
-
-    /**
-     * Loads the specified resource from classpath.
-     *
-     * @throws IllegalStateException If the requested resource is not available.
-     */
-    private fun loadResource(path: String): URL {
-        val resourceUrl = this::class.java.getResource(path)
-        checkNotNull(resourceUrl) {
-            "Resource not found in classpath: `$path`."
-        }
-        return resourceUrl
-    }
-
-    /**
-     * Opens [InputStream] on the specified resource in the classpath.
-     */
-    private fun loadResourceAsStream(path: String): InputStream {
-        return loadResource(path).openStream()
-    }
-
-    /**
-     * Returns the list of resources in the classpath by the [path] specified.
-     */
-    @Suppress("SameParameterValue")
-    private fun listResources(path: String): Set<String> {
-        val resourceUrl = loadResource(path)
-        check(resourceUrl.protocol == "jar") {
-            "Protocol is not supported yet: `${resourceUrl.protocol}`."
-        }
-        val result: MutableSet<String> = mutableSetOf()
-        val resourcePath = resourceUrl.path
-        val afterProtocol = "file:".length
-        val beforeJarEntry = resourcePath.indexOf("!")
-        val jarPath = resourcePath.substring(afterProtocol, beforeJarEntry)
-        val jarFile = JarFile(URLDecoder.decode(jarPath, "UTF-8"))
-        val jarEntries = jarFile.entries()
-        while (jarEntries.hasMoreElements()) {
-            val entryName = jarEntries.nextElement().name
-            if (entryName.startsWith(path.substring(1))
-                && !entryName.endsWith("/")
-            ) {
-                result.add(entryName.substring(path.length - 1))
-            }
-        }
-        return result
     }
 }
 
 /**
- * Obtains the extension the plugin added to this Gradle project.
+ * Unpacks zip file to [destinationDir], applying the given [entryFilter] to the entries.
  */
-private val Project.extension: ParametersExtension
-    get() = extensions.getByType(ParametersExtension::class.java)
+public fun File.unzipTo(
+    destinationDir: File,
+    entryFilter: (entryName: String) -> Boolean
+) {
+    ZipFile(this).use { zipFile ->
+        zipFile.entries().asSequence()
+            .filter { entry ->
+                !entry.isDirectory && entryFilter(entry.name)
+            }
+            .forEach { entry ->
+                File(destinationDir, entry.name).also { destinationFile ->
+                    destinationFile.parentFile.mkdirs()
+                    val inputStream = zipFile.getInputStream(entry)
+                    val outputStream = destinationFile.outputStream()
+                    inputStream.copyTo(outputStream)
+                    // The streams are closed directly because sometimes
+                    // the test can fail due to the Gradle wrapper executable
+                    // being locked by another process.
+                    inputStream.close()
+                    outputStream.close()
+                }
+            }
+    }
+}

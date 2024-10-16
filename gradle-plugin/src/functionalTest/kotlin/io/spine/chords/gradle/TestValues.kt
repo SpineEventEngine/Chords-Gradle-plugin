@@ -33,16 +33,26 @@ package io.spine.chords.gradle
 /**
  * Generates the content of `build.gradle.kts` to execute the tests with.
  */
-internal fun generateGradleBuildFile(pluginId: String): String = """
+internal fun generateGradleBuildFile(
+    pluginId: String,
+    spineArtifactsRepo: String
+): String = """
 
 plugins {
     id("$pluginId")
 }
 
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven("$spineArtifactsRepo/releases")
+    maven("$spineArtifactsRepo/snapshots")
+}
+
 chordsGradlePlugin {
     protoDependencies("io.spine:spine-money:1.5.0")
     codegenPluginsArtifact = 
-        "io.spine.chords:spine-chords-codegen-plugins:2.0.0-SNAPSHOT.27"
+        "io.spine.chords:spine-chords-codegen-plugins:2.0.0-SNAPSHOT.32"
 }
 
 """.trimIndent()
