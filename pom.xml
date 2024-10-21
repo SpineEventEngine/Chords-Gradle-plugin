@@ -10,7 +10,7 @@ all modules and does not describe the project structure per-subproject.
  -->
 <groupId>io.spine.chords</groupId>
 <artifactId>Chords-Gradle-plugin</artifactId>
-<version>1.9.11</version>
+<version>1.9.20</version>
 
 <inceptionYear>2015</inceptionYear>
 
