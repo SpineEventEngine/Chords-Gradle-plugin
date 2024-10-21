@@ -71,7 +71,7 @@ tasks.named("test") {
 pluginBundle {
     website = "https://github.com/SpineEventEngine/Chords-Gradle-plugin/blob/master/README.md"
     vcsUrl = "https://github.com/SpineEventEngine/Chords-Gradle-plugin"
-    tags = listOf("spine", "chords", "gradle", "plugin", "protobuf", "codegen")
+    tags = listOf("spine", "chords", "gradle", "plugin", "protobuf", "codegen", "compose")
 
     mavenCoordinates {
         groupId = "io.spine.chords"
