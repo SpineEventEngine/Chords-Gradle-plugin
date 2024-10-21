@@ -33,4 +33,4 @@
  *
  * The version should be updated to `2.0.x` after migrating to Spine `2.0.x`.
  */
-val gradlePluginVersion: String by extra("1.9.10")
+val gradlePluginVersion: String by extra("1.9.11")
