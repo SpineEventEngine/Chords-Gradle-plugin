@@ -105,10 +105,9 @@ public class GradlePlugin : Plugin<Project> {
         } else {
             project.logger.warn(
                 """
-                Warning! `Chords-Gradle-plugin` will not be applied to module `${project.name}`.
-                Task `compileKotlin` not found, so required dependency was not added.
+                WARNING: `Chords-Gradle-plugin` will not be automatically applied to the module `${project.name}`.
                 To generate code, execute `applyCodegenPlugins` task before `compileKotlin`.
-                """
+                """.trimIndent()
             )
         }
     }

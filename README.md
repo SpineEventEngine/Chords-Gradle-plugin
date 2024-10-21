@@ -1,6 +1,6 @@
-# Chords-Gradle-plugin
 [![Ubuntu build][ubuntu-build-badge]][gh-actions]
 [![license](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
+# Chords-Gradle-plugin
 
 Gradle plugin for [Spine Chords](https://github.com/SpineEventEngine/Chords/) 
 library that generates Kotlin extensions for Proto messages.
@@ -19,6 +19,7 @@ that returns the instance of `MessageDef` implementation for the current message
 ## Requirements
 - Java 11
 - Gradle `6.9.x`
+- Kotlin `1.8.20`
 
 ## How it works
 
@@ -41,7 +42,7 @@ to the original project.
 The following configuration should be added to the `build.gradle.kts` to apply the plugin:
 ```kotlin
 plugins {
-    id("io.spine.chords") version "1.9.5" // Specify the actual version here.
+    id("io.spine.chords") version "1.9.10" // Specify the actual version here.
 }
 
 // Plugin configuration.
@@ -55,7 +56,7 @@ chordsGradlePlugin {
     // The version or even name will differ in your case.
     //
     codegenPluginsArtifact = 
-        "io.spine.chords:spine-chords-codegen-plugins:2.0.0-SNAPSHOT.27"
+        "io.spine.chords:spine-chords-codegen-plugins:2.0.0-SNAPSHOT.35"
     
     // Specify the Proto dependencies that are required for code generation.
     //
@@ -82,8 +83,5 @@ tasks.named("compileKotlin") {
 }
 ```
 
-
 [gh-actions]: https://github.com/SpineEventEngine/Chords-Gradle-plugin/actions
 [ubuntu-build-badge]: https://github.com/SpineEventEngine/Chords-Gradle-plugin/actions/workflows/build-on-ubuntu.yml/badge.svg
-
-

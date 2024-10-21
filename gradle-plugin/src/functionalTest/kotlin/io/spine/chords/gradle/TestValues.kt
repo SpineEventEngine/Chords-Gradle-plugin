@@ -52,7 +52,7 @@ repositories {
 chordsGradlePlugin {
     protoDependencies("io.spine:spine-money:1.5.0")
     codegenPluginsArtifact = 
-        "io.spine.chords:spine-chords-codegen-plugins:2.0.0-SNAPSHOT.32"
+        "io.spine.chords:spine-chords-codegen-plugins:2.0.0-SNAPSHOT.35"
 }
 
 """.trimIndent()
