@@ -47,18 +47,6 @@ repositories {
 }
 
 /**
- * The version of Spine Bootstrap plugin,
- * applied within this `buildSrc`.
- *
- * It is expected that this version is the same,
- * as the versions of Spine server- and client-related libraries
- * on top of which the Spine application is running.
- *
- * See `Spine` dependency object.
- */
-val spineVersion = "1.9.0"
-
-/**
  * The version of Jackson used by `buildSrc`.
  *
  * Please keep this value in sync with [io.spine.internal.dependency.Jackson.version].
@@ -107,16 +95,6 @@ val guavaVersion = "31.1-jre"
 val errorPronePluginVersion = "3.1.0"
 
 /**
- * The version of Protobuf Gradle Plugin.
- *
- * Please keep in sync. with [io.spine.internal.dependency.Protobuf.GradlePlugin.version].
- *
- * @see <a href="https://github.com/google/protobuf-gradle-plugin/releases">
- *     Protobuf Gradle Plugins Releases</a>
- */
-//val protobufPluginVersion = "0.8.19"
-
-/**
  * The version of Dokka Gradle Plugins.
  *
  * Please keep in sync with [io.spine.internal.dependency.Dokka.version].
@@ -142,15 +120,6 @@ val kotestJvmPluginVersion = "0.3.8"
  * @see [io.spine.internal.dependency.Kover]
  */
 val koverVersion = "0.6.1"
-
-/**
- * The version of the Shadow Plugin.
- *
- * `6.1.0` is the last version compatible with Gradle 6.9.x.
- *
- * @see <a href="https://github.com/johnrengelman/shadow/releases">Shadow Plugin releases</a>
- */
-val shadowVersion = "6.1.0"
 
 configurations.all {
     resolutionStrategy {
@@ -185,14 +154,12 @@ dependencies {
     dependOnAuthCommon()
 
     listOf(
-        "io.spine.tools:spine-bootstrap:$spineVersion",
         "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
         "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jacksonVersion",
         "com.github.jk1:gradle-license-report:$licenseReportVersion",
         "com.google.guava:guava:$guavaVersion",
         "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detektVersion",
         "io.kotest:kotest-gradle-plugin:$kotestJvmPluginVersion",
-        // https://github.com/srikanth-lingala/zip4j
         "net.lingala.zip4j:zip4j:2.10.0",
         "net.ltgt.gradle:gradle-errorprone-plugin:${errorPronePluginVersion}",
         "org.ajoberstar.grgit:grgit-core:${grGitVersion}",
@@ -201,8 +168,7 @@ dependencies {
         "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion",
         "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
         "org.jetbrains.kotlinx.kover:org.jetbrains.kotlinx.kover.gradle.plugin:$koverVersion",
-        "org.jetbrains.kotlin.jvm:org.jetbrains.kotlin.jvm.gradle.plugin:$kotlinVersion",
-        "com.github.jengelman.gradle.plugins:shadow:${shadowVersion}"
+        "org.jetbrains.kotlin.jvm:org.jetbrains.kotlin.jvm.gradle.plugin:$kotlinVersion"
     ).forEach {
         implementation(it)
     }
@@ -221,26 +187,6 @@ buildscript {
 
     dependencies {
         classpath("org.jetbrains.kotlinx.kover:org.jetbrains.kotlinx.kover.gradle.plugin:$koverVersion")
-    }
-}
-
-dependOnBuildSrcJar()
-
-/**
- * Adds a dependency on a `buildSrc.jar`, iff:
- *  1) the `src` folder is missing, and
- *  2) `buildSrc.jar` is present in `buildSrc/` folder instead.
- *
- * This approach is used in the scope of integration testing.
- */
-fun Project.dependOnBuildSrcJar() {
-    val srcFolder = this.rootDir.resolve("src")
-    val buildSrcJar = rootDir.resolve("buildSrc.jar")
-    if (!srcFolder.exists() && buildSrcJar.exists()) {
-        logger.info("Adding the pre-compiled 'buildSrc.jar' to 'implementation' dependencies.")
-        dependencies {
-            implementation(files("buildSrc.jar"))
-        }
     }
 }
 
