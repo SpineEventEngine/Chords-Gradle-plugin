@@ -25,13 +25,14 @@
  */
 
 import io.spine.internal.dependency.JUnit
+import io.spine.internal.gradle.isSnapshot
 import io.spine.internal.gradle.publish.ChordsPublishing
 import io.spine.internal.gradle.publish.SpinePublishing
 
 plugins {
     `java-gradle-plugin`
     `maven-publish`
-//    id("com.gradle.plugin-publish") version "0.12.0"
+    id("com.gradle.plugin-publish") version "0.12.0"
 }
 
 repositories {
@@ -43,7 +44,7 @@ dependencies {
     testImplementation(JUnit.runner)
 }
 
-val versionToPublish = project.version
+val versionToPublish = project.version.toString()
 
 val functionalTest: SourceSet by sourceSets.creating
 gradlePlugin.testSourceSets(functionalTest)
@@ -67,27 +68,27 @@ tasks.named("test") {
     dependsOn(functionalTestTask)
 }
 
-//pluginBundle {
-//    website = "https://github.com/SpineEventEngine/Chords-Gradle-plugin/blob/master/README.md"
-//    vcsUrl = "https://github.com/SpineEventEngine/Chords-Gradle-plugin"
-//    tags = listOf("spine", "chords", "gradle", "plugin", "protobuf", "codegen")
-//
-//    mavenCoordinates {
-//        groupId = "io.spine.chords"
-//        artifactId = "spine-chords-gradle-plugin"
-//        version = versionToPublish
-//    }
-//}
-//
-//val publish: Task by tasks.getting {
-//    dependsOn(publishPlugins)
-//}
-//
+pluginBundle {
+    website = "https://github.com/SpineEventEngine/Chords-Gradle-plugin/blob/master/README.md"
+    vcsUrl = "https://github.com/SpineEventEngine/Chords-Gradle-plugin"
+    tags = listOf("spine", "chords", "gradle", "plugin", "protobuf", "codegen", "compose")
+
+    mavenCoordinates {
+        groupId = "io.spine.chords"
+        artifactId = "spine-chords-gradle-plugin"
+        version = versionToPublish
+    }
+}
+
 // Do not attempt to publish snapshot versions to comply with publishing rules.
 // See: https://plugins.gradle.org/docs/publish-plugin#approval
-//val publishPlugins: Task by tasks.getting {
-//    enabled = !versionToPublish.isSnapshot()
-//}
+val publishPlugins: Task by tasks.getting {
+    enabled = !versionToPublish.isSnapshot()
+}
+
+val publish: Task by tasks.getting {
+    dependsOn(publishPlugins)
+}
 
 gradlePlugin {
     plugins {
