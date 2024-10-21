@@ -67,16 +67,10 @@ tasks.named("test") {
     dependsOn(functionalTestTask)
 }
 
-// We do not publish the plugin to Gradle Plugin Portal because
-// the plugin should be in a dedicated Git repository.
-// See https://github.com/SpineEventEngine/Chords/issues/50 for detail.
-//
-// It is published to Spine Cloud Artifacts repository for now.
-//
 //pluginBundle {
-//    website = "https://spine.io"
-//    vcsUrl = "https://github.com/SpineEventEngine/Chords/tree/master/codegen/gradle-plugin"
-//    tags = listOf("spine", "chords", "gradle", "plugin", "codegen")
+//    website = "https://github.com/SpineEventEngine/Chords-Gradle-plugin/blob/master/README.md"
+//    vcsUrl = "https://github.com/SpineEventEngine/Chords-Gradle-plugin"
+//    tags = listOf("spine", "chords", "gradle", "plugin", "protobuf", "codegen")
 //
 //    mavenCoordinates {
 //        groupId = "io.spine.chords"
@@ -95,17 +89,13 @@ tasks.named("test") {
 //    enabled = !versionToPublish.isSnapshot()
 //}
 
-//@Suppress("UnstableApiUsage") // `@Incubating` properties of `gradlePlugin`.
 gradlePlugin {
-    //website.set("https://spine.io")
-    //vcsUrl.set("https://github.com/SpineEventEngine/Chords-Gradle-plugin")
     plugins {
         create("chordsGradlePlugin") {
             id = ChordsPublishing.GradlePlugin.id
             displayName = "Chords Codegen Gradle Plugin"
             description = "A plugin that generates Kotlin extensions for Proto messages."
             implementationClass = "io.spine.chords.gradle.GradlePlugin"
-            //tags.set(listOf("spine", "chords", "gradle", "plugin", "codegen"))
         }
     }
 }
