@@ -73,7 +73,7 @@ detekt {
     //   module's content. The custom config adds Compose-specific declarations.
     //   See whether/how `config` can be updated accordingly.
     //   See https://github.com/SpineEventEngine/Chords/issues/3
-    config.from(files("${rootDir}/config/quality/detekt-config.yml"))
+    config.from(files("${rootDir}/config/buildSrc/quality/detekt-config.yml"))
 }
 
 tasks {

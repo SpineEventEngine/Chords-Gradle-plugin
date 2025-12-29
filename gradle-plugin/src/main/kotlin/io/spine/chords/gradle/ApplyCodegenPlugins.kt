@@ -30,7 +30,7 @@ public open class ApplyCodegenPlugins : DefaultTask() {
         /**
          * Default Gradle build timeout.
          */
-        private const val BUILD_TIMEOUT_MINUTES: Long = 10
+        private const val BUILD_TIMEOUT_MINUTES: Long = 20
     }
 
     /**
