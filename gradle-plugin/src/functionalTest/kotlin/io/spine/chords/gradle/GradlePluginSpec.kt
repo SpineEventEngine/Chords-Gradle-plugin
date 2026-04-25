@@ -1,5 +1,5 @@
 /*
- * Copyright 2024, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,12 +27,13 @@
 package io.spine.chords.gradle
 
 import io.kotest.assertions.withClue
+import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
-import java.io.File
-import java.io.FileWriter
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import java.io.File
+import java.io.FileWriter
 
 /**
  * The functional test for `io.spine.chords.gradle` Gradle plugin.
@@ -46,6 +47,19 @@ class GradlePluginSpec {
          * The `id` of the plugin to apply.
          */
         private const val pluginId = "io.spine.chords"
+
+        /**
+         * The Chords `codegen-plugins` dependency to generate the code with.
+         */
+        private object CodegenPlugins {
+            private const val group = "io.spine.chords"
+            private const val prefix = "spine-chords-"
+
+            // The latest version as of 2026-04-24.
+            private const val version = "2.0.0-SNAPSHOT.85"
+
+            const val artifact = "$group:${prefix}codegen-plugins:$version"
+        }
 
         /**
          * The Spine cloud artifacts repo to load the `codegen-plugins` from.
@@ -78,7 +92,11 @@ class GradlePluginSpec {
 
         File(projectDir, "settings.gradle.kts").writeText("")
         File(projectDir, "build.gradle.kts").writeText(
-            generateGradleBuildFile(pluginId, spineArtifactsRepo)
+            generateGradleBuildFile(
+                pluginId,
+                CodegenPlugins.artifact,
+                spineArtifactsRepo
+            )
         )
         File(projectDir, sourceProtoFile).writeText(
             protoFileContent
@@ -100,8 +118,12 @@ class GradlePluginSpec {
             result.output.contains(message) shouldBe true
         }
 
+        val expectedFile = File(projectDir, expectedKotlinFile)
         withClue("The required Kotlin file has not been generated.") {
-            File(projectDir, expectedKotlinFile).exists() shouldBe true
+            expectedFile.exists() shouldBe true
+        }
+        withClue("The generated Kotlin file is empty.") {
+            expectedFile.readText().length shouldBeGreaterThan 0
         }
     }
 }

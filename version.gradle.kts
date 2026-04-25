@@ -1,5 +1,5 @@
 /*
- * Copyright 2024, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,4 +33,4 @@
  *
  * The version should be updated to `2.0.x` after migrating to Spine `2.0.x`.
  */
-val gradlePluginVersion: String by extra("1.9.21")
+val gradlePluginVersion: String by extra("1.9.22")

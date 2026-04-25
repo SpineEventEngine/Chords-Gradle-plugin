@@ -1,5 +1,5 @@
 /*
- * Copyright 2024, TeamDev. All rights reserved.
+ * Copyright 2026, TeamDev. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ package io.spine.chords.gradle
  */
 internal fun generateGradleBuildFile(
     pluginId: String,
+    codegenPluginsArtifact: String,
     spineArtifactsRepo: String
 ): String = """
 
@@ -51,8 +52,7 @@ repositories {
 
 chordsGradlePlugin {
     protoDependencies("io.spine:spine-money:1.5.0")
-    codegenPluginsArtifact = 
-        "io.spine.chords:spine-chords-codegen-plugins:2.0.0-SNAPSHOT.81"
+    codegenPluginsArtifact = "$codegenPluginsArtifact"
 }
 
 """.trimIndent()
